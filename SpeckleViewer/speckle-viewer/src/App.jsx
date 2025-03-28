@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import SpeckleViewer from'./components/SpeckleViewer';
+import SpeckleViewer from './components/SpeckleViewer';
 
 function App() {
   return (
