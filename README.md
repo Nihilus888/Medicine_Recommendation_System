@@ -1,9 +1,17 @@
-# Elliott Tay's Portfolio
+# Speckle Viewer
+This project aims to replicate parts of speckle for CAD-BIM integration that requires 3D rendering and API Integrations with Speckle
 
-I decided to create a new portfolio using next.js as I decide to pick up a new technology and next.js seems to be the latest thing in the tech market. 
-With the help of some youtube videos, documentations and ChatGPT, it gave me a structure on how I should create and design this website. There were some difficulties
-in deploying this website to vercel as there were some compatibility issues in the files and what not. The good thing is that it was just some issues with apostrophes and some issue with
-the file names. 
+## Tech Stack
+One of the most important considerations is choosing your tech stack as it is a software architectural design decision and I decided to go with these tech stack based on various considerations that I have identified:
 
+1. React.js/Three.js
+I chose React.js as there is a specific library called React Three Fiber which is a good React renderer that integrates well with Three.js. Another consideration is that I'm
+personally more familiar with React compared with other popular frontend frameworks like Vue or Angular
 
-Here is the website link: https://new-portfolio-hazel-tau.vercel.app/
+2.Node.js 
+Node.js integrates very well with React.js and MongoDB which was my choice of my database. This tech stack is quite popular as it is the MERN stack which is versatile, easy to scale 
+and scaffold.
+
+3. MongoDB
+After testing their REST API with their various endpoints via Postman, it looks like they have a lot of unstructured data that is in a JSON format. My rationale is using a relational
+database like MySQL or PostgreSQL will not be appropriate due to how there is a lot of metadata and unstructured data for the 3D rendering.
