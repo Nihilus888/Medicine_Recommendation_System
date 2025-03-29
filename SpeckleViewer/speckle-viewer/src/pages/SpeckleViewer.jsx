@@ -8,7 +8,8 @@ import {
   UrlHelper,
 } from '@speckle/viewer';
 
-import { makeMeasurementsUI } from './MeasurementsUI'; // Import your UI function
+import { makeMeasurementsUI } from '../components/MeasurementsUI'; // Import your UI function
+import ExtendedSelection from '../components/ExtendedSelection';
 
 const fetchModelDataFromMongo = async () => {
   const response = await fetch('http://localhost:5000/api/models/67e6b1fc1e863b0dcf3aa431', { 
@@ -69,8 +70,14 @@ const SpeckleViewer = () => {
 
           // Add Extensions
           newViewer.createExtension(CameraController);
-          const measurements = newViewer.createExtension(MeasurementsExtension);
-          measurements.enabled = true; // Enable Measurements
+          
+          // const measurements = newViewer.createExtension(MeasurementsExtension);
+          // measurements.enabled = true; 
+
+          /** Add our extended selection extension */
+          const extendedSelection = newViewer.createExtension(ExtendedSelection); 
+          /** Init our extension */
+          extendedSelection.init();
 
           setViewer(newViewer);
 
