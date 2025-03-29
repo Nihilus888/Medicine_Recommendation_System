@@ -33,3 +33,15 @@ granted the necessary
 permissions to call the necessary information. As I was using REST API and not GraphQL to call the JSON data, there were times where the data was quite large and it crashed my Postman while I was doing data exploration. 
 
 After exploring the data, I integrated with their API using Node.js where I called their API and integrated the data and stored those data into my database which was MongoDB. I had to structure the data in such a way where all the object Ids for a particular model would be kept into an array with a unique id where I can do a for loop and iterate through the object Ids to generate the 3D rendering via Speckle Viewer. 
+
+## Frontend
+
+On the frontend, I used React-Routers for routing of my pages and had to do a lot of research on Speckle Viewer library after researching on their documentation to find out how to use it as they have integrated three.js to display the 3D models. There were two main things that I noticed after reading through the documentation which was:
+
+1. The Speckle Viewer
+
+This is where the main camera is where we can download the objectIds from the model and display it. Furthermore, we can interact with the camera and do panning, zooming in and zooming out and various rotations.
+
+2. Add-ons
+
+There are certain features that can be added to the main speckle viewer with many examples that was shown however many of them were written in typescript which I'm not familiar with and a lot of the methods that were in the documentation have been deprecated according to the migration document update. So I have to choose those that are not deprecated and have no issues.
