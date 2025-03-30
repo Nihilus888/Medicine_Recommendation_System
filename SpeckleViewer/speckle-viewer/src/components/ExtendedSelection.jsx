@@ -1,174 +1,170 @@
 import { UpdateFlags } from '@speckle/viewer';
-import { ObjectLayers, SelectionExtension } from '@speckle/viewer'; // Updated import
+import { ObjectLayers, SelectionExtension } from '@speckle/viewer';
 import { Object3D, Vector3, Box3 } from 'three';
-import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';// Correct import
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 
 class ExtendedSelection extends SelectionExtension {
-  /** This object will receive the TransformControls translation */
   constructor(options = {}) {
     super(options);
     this.dummyAnchor = new Object3D();
     this.transformControls = undefined;
     this.lastGizmoTranslation = new Vector3();
-    this.snapToGrid = true; // Enable snapping by default
-    this.gridSize = 1; // Define the grid size
+    this.snapToGrid = true;
+    this.gridSize = 1;
+    this.metadataCallback = null; 
   }
 
   init() {
-    /** We set the layers to PROPS so that the viewer regular pipeline ignores it */
     this.dummyAnchor.layers.set(ObjectLayers.PROPS);
     this.viewer.getRenderer().scene.add(this.dummyAnchor);
     this.initGizmo();
   }
 
+  setMetadataCallback(callback) {
+    this.metadataCallback = callback;
+  }
+
   selectObjects(ids, multiSelect = false) {
     super.selectObjects(ids, multiSelect);
-    this.updateGizmo(ids.length ? true : false);
+    this.updateGizmo(Object.keys(this.selectionRvs).length > 0);
+    this.extractMetadata();
   }
 
   onObjectClicked(selection) {
-    /** Do whatever the base extension is doing */
     super.onObjectClicked(selection);
-
-    /** Update the anchor and gizmo location */
-    this.updateGizmo(selection && selection.hits && selection.hits.length > 0);
+    this.updateGizmo(selection?.hits?.length > 0);
+    this.extractMetadata();
   }
 
   initGizmo() {
     const camera = this.viewer.getRenderer().renderingCamera;
     if (!camera) {
-      throw new Error('Cannot init move gizmo with no camera');
+      console.error('Cannot initialize gizmo without a camera');
+      return;
     }
 
-    /** Create a new TransformControls gizmo */
     this.transformControls = new TransformControls(
       camera,
       this.viewer.getRenderer().renderer.domElement
     );
 
-    /** Attach the gizmo to the scene */
     this.viewer.getRenderer().scene.add(this.transformControls);
 
-    /** These are the TransformControls events */
     this.transformControls.addEventListener('change', () => {
-      /** We request a render each time we interact with the gizmo */
       this.viewer.requestRender();
     });
 
     this.transformControls.addEventListener('dragging-changed', (event) => {
-      /** When we start dragging the gizmo, we disable the camera controls
-       *  and re-enable them once we're done
-       */
-      const val = !!event.value;
-      if (val) {
-        this.cameraProvider.enabled = !val;
+      if (this.cameraProvider) {
+        this.cameraProvider.enabled = !event.value;
+        if (!event.value) {
+          setTimeout(() => {
+            this.cameraProvider.enabled = true;
+          }, 100);
+        }
       } else {
-        setTimeout(() => {
-          this.cameraProvider.enabled = !val;
-        }, 100);
+        console.warn('cameraProvider is undefined during dragging-changed event');
       }
     });
 
-    this.transformControls.addEventListener(
-      'objectChange',
-      this.onAnchorChanged.bind(this)
-    );
+    this.transformControls.addEventListener('objectChange', this.onAnchorChanged.bind(this));
   }
 
-  /** This positions the anchor and gizmo to the center of the selected objects
-   *  bounds. Note that a single selection might yield multiple individual objects
-   *  to get selected
-   */
   updateGizmo(attach) {
     const box = new Box3();
-    for (const k in this.selectionRvs) {
-      const batchObject = this.viewer
-        .getRenderer()
-        .getObject(this.selectionRvs[k]);
-      if (!batchObject) continue;
+    Object.values(this.selectionRvs).forEach((selectedObj) => {
+      const batchObject = this.viewer.getRenderer().getObject(selectedObj._batchId);
+      if (!batchObject) return;
       box.union(batchObject.aabb);
-    }
+    });
+
     const center = box.getCenter(new Vector3());
-    
-    // Optionally, snap the center position to the grid
-    if (this.snapToGrid) {
-      this.snapToGridPosition(center);
-    }
+    if (this.snapToGrid) this.snapToGridPosition(center);
 
     this.dummyAnchor.position.copy(center);
-    this.lastGizmoTranslation.copy(this.dummyAnchor.position);
-    
-    // Optionally, set a pivot point (can be the center or a specific point)
+    this.lastGizmoTranslation.copy(center);
+
     const pivot = this.calculatePivotPoint();
-    if (pivot) {
-      this.dummyAnchor.position.copy(pivot);
-    }
+    if (pivot) this.dummyAnchor.position.copy(pivot);
 
     if (this.transformControls) {
-      if (attach) {
-        this.transformControls.attach(this.dummyAnchor);
-      } else {
-        this.transformControls.detach();
-      }
+      attach ? this.transformControls.attach(this.dummyAnchor) : this.transformControls.detach();
     }
   }
 
-  /** This is where the transformation gets applied */
   onAnchorChanged() {
-    /** We get the bounds of the entire group on rvs, since clicking
-     *  on a single object might yield multiple objects (hosted elements,
-     *  multiple display values, etc)
-     */
+    Object.values(this.selectionRvs).forEach((selectedObj) => {
+      const batchObject = this.viewer.getRenderer().getObject(selectedObj._batchId);
+      if (!batchObject) return;
 
-    for (const k in this.selectionRvs) {
-      const batchObject = this.viewer
-        .getRenderer()
-        .getObject(this.selectionRvs[k]);
-      /** Only objects of type mesh can have batch objects.
-       *  Lines and points do not
-       */
-      if (!batchObject) continue;
-      /** This is where we moved the gizmo to */
-      const anchorPos = new Vector3().copy(this.dummyAnchor.position);
-      const anchorPosDelta = anchorPos.sub(this.lastGizmoTranslation);
-      /** Apply the transformation */
-      batchObject.transformTRS(
-        anchorPosDelta.add(batchObject.translation),
-        undefined,
-        undefined,
-        undefined
-      );
-    }
+      const translationDelta = this.dummyAnchor.position.clone().sub(this.lastGizmoTranslation);
+      if (translationDelta.length() === 0) return;
+
+      try {
+        batchObject.transformTRS(
+          batchObject.translation.clone().add(translationDelta),
+          batchObject.rotation,
+          batchObject.scale
+        );
+      } catch (error) {
+        console.error(`Failed to apply transform to object: ${selectedObj._batchId}`, error);
+      }
+    });
 
     this.lastGizmoTranslation.copy(this.dummyAnchor.position);
     this.viewer.requestRender(UpdateFlags.RENDER_RESET | UpdateFlags.SHADOWS);
   }
 
-  // Function to snap the position to the grid
   snapToGridPosition(position) {
-    position.x = Math.round(position.x / this.gridSize) * this.gridSize;
-    position.y = Math.round(position.y / this.gridSize) * this.gridSize;
-    position.z = Math.round(position.z / this.gridSize) * this.gridSize;
+    position.set(
+      Math.round(position.x / this.gridSize) * this.gridSize,
+      Math.round(position.y / this.gridSize) * this.gridSize,
+      Math.round(position.z / this.gridSize) * this.gridSize
+    );
   }
 
-  // Function to calculate a pivot point (for now, it averages the positions of all selected objects)
   calculatePivotPoint() {
-    if (this.selectionRvs.length === 1) {
-      return this.viewer
-        .getRenderer()
-        .getObject(this.selectionRvs[0])
-        .position.clone();
+    const values = Object.values(this.selectionRvs);
+    if (!values.length) return null;
+
+    if (values.length === 1) {
+      const batchObject = this.viewer.getRenderer().getObject(values[0]._batchId);
+      return batchObject?.position?.clone() ?? null;
     }
 
     const averagePosition = new Vector3();
-    this.selectionRvs.forEach((id) => {
-      const batchObject = this.viewer.getRenderer().getObject(id);
-      if (batchObject) {
+    let validCount = 0;
+
+    values.forEach((selectedObj) => {
+      const batchObject = this.viewer.getRenderer().getObject(selectedObj._batchId);
+      if (batchObject?.position) {
         averagePosition.add(batchObject.position);
+        validCount++;
       }
     });
 
-    return averagePosition.divideScalar(this.selectionRvs.length);
+    return validCount > 0 ? averagePosition.divideScalar(validCount) : null;
+  }
+
+  extractMetadata() {
+    const metadata = Object.values(this.selectionRvs).map(selectedObj => ({
+      batchId: selectedObj._batchId,
+      geometryId: selectedObj.guid,
+      geometryType: selectedObj.geometryType,
+      speckleType: selectedObj.renderData?.speckleType || 'Unknown',
+    }));
+  
+    if (this.metadataCallback) {
+      this.metadataCallback(metadata); // Pass extracted metadata
+    }
+  }
+
+  onObjectDoubleClick(event) {
+    if (this.cameraProvider?.setCameraView) {
+      this.cameraProvider.setCameraView(event);
+    } else {
+      console.warn('cameraProvider or setCameraView is undefined during onObjectDoubleClick');
+    }
   }
 }
 

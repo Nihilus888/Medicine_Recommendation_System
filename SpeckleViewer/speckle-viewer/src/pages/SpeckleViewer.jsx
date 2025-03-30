@@ -6,13 +6,15 @@ import {
   CameraController,
   MeasurementsExtension,
   UrlHelper,
+  SectionOutlines, // SectionOutlines will remain as it can still be useful
 } from '@speckle/viewer';
 
+import MetadataTooltip from '../components/MetaDataToolTip';
 import { makeMeasurementsUI } from '../components/MeasurementsUI'; // Import your UI function
 import ExtendedSelection from '../components/ExtendedSelection';
 
 const fetchModelDataFromMongo = async () => {
-  const response = await fetch('http://localhost:5000/api/models/67e6b1fc1e863b0dcf3aa431', { 
+  const response = await fetch('http://localhost:5000/api/models/67e6b1fc1e863b0dcf3aa431', {
     method: 'GET',
   });
 
@@ -49,7 +51,7 @@ const fetchObjectData = async (projectId, objectId, authToken) => {
 const SpeckleViewer = () => {
   const viewerRef = useRef(null);
   const [viewer, setViewer] = useState(null);
-  const [objectIds, setObjects] = useState([]);
+  const [selectedMetadata, setSelectedMetadata] = useState(null);
   const authToken = "9e16053cbe2a0811802746b4e3531367a0874e43b0"; // Replace with your token
   const projectId = 'c832429e56'; // Hardcoded project ID
 
@@ -58,7 +60,8 @@ const SpeckleViewer = () => {
       // Fetch model data
       const modelData = await fetchModelDataFromMongo();
       if (modelData && Array.isArray(modelData.objectIds)) {
-        setObjects(modelData.objectIds);
+        // Set objectIds
+        const objectIds = modelData.objectIds;
 
         if (viewerRef.current && !viewer) {
           const params = DefaultViewerParams;
@@ -70,19 +73,14 @@ const SpeckleViewer = () => {
 
           // Add Extensions
           newViewer.createExtension(CameraController);
-          
-          // const measurements = newViewer.createExtension(MeasurementsExtension);
-          // measurements.enabled = true; 
 
-          /** Add our extended selection extension */
-          const extendedSelection = newViewer.createExtension(ExtendedSelection); 
-          /** Init our extension */
-          extendedSelection.init();
+          // Initialize Measurement UI
+          const measurements = newViewer.createExtension(MeasurementsExtension);
+          measurements.enabled = true; // Activate measurements UI
 
-          setViewer(newViewer);
-
-          // Load Objects
-          for (let objectId of modelData.objectIds) {
+          // Wait for all objects to load and then load the objects
+          const loadPromises = [];
+          for (let objectId of objectIds) {
             const objectData = await fetchObjectData(projectId, objectId, authToken);
             if (objectData) {
               const urls = await UrlHelper.getResourceUrls(
@@ -90,15 +88,25 @@ const SpeckleViewer = () => {
               );
               for (const url of urls) {
                 const loader = new SpeckleLoader(newViewer.getWorldTree(), url, "");
-                await newViewer.loadObject(loader, true);
+                loadPromises.push(newViewer.loadObject(loader, true));
               }
             } else {
               console.error(`No model found for object ${objectId}`);
             }
           }
 
+          // Initialize Extended Selection
+          const extendedSelection = newViewer.createExtension(ExtendedSelection);
+          extendedSelection.init();
+
+          extendedSelection.setMetadataCallback(setSelectedMetadata);
+
+          // Wait for all objects to load
+          await Promise.all(loadPromises);
+
+          setViewer(newViewer);
+
           // Initialize Measurements UI
-          console.log("Initializing Measurements UI...");
           makeMeasurementsUI(newViewer); // Call your UI function
         }
       } else {
@@ -116,16 +124,12 @@ const SpeckleViewer = () => {
     };
   }, [viewerRef, viewer, authToken, projectId]);
 
-  useEffect(() => {
-    console.log('Updated objectIds state:', objectIds);
-  }, [objectIds]);
-
   return (
-    <div>
-      <div 
-        ref={viewerRef} 
-        style={{ width: '100%', height: '500px', marginTop: '80px' }} 
-      />
+    <div style={{ display: 'flex', height: '100vh' }}>
+      <div ref={viewerRef} style={{ flex: 1, height: '600px' }} />
+
+      {/* Metadata Tooltip Component */}
+      {selectedMetadata && <MetadataTooltip metadata={selectedMetadata} />}
     </div>
   );
 };
