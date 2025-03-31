@@ -32,7 +32,7 @@ documentation, I used Postman to test the API after being
 granted the necessary 
 permissions to call the necessary information. As I was using REST API and not GraphQL to call the JSON data, there were times where the data was quite large and it crashed my Postman while I was doing data exploration. 
 
-After exploring the data, I integrated with their API using Node.js where I called their API and integrated the data and stored those data into my database which was MongoDB. I had to structure the data in such a way where all the object Ids for a particular model would be kept into an array with a unique id where I can do a for loop and iterate through the object Ids to generate the 3D rendering via Speckle Viewer. 
+After exploring the data, I integrated with their API using Node.js where I called all their API endpoints which was listed on their REST API documentation and integrated the data and stored those data into my database which was MongoDB. I had to structure the data in such a way where all the object Ids for a particular model would be kept into an array with a unique id where I can do a for loop and iterate through the object Ids to generate the 3D rendering via Speckle Viewer. 
 
 ## Frontend
 
@@ -44,4 +44,17 @@ This is where the main camera is where we can download the objectIds from the mo
 
 2. Add-ons
 
-There are certain features that can be added to the main speckle viewer with many examples that was shown however many of them were written in typescript which I'm not familiar with and a lot of the methods that were in the documentation have been deprecated according to the migration document update. So I have to choose those that are not deprecated and have no issues.
+There are certain features that can be added to the main speckle viewer with many examples that was shown however many of them were written in typescript which I'm not familiar 
+with and a lot of the methods that were in the documentation have been deprecated according to the migration document update. So I have to choose those that are not deprecated 
+and have no issues.
+
+There are three main functionalities that I did which I think are important from my understanding of architecture and CAD:
+
+1. Camera panning, zoom and interaction with the model
+2. Measurement tools 
+3. Selection extraction tools with metadata extractor
+
+Adding more tools or more advanced models would start to cause the downloading of the models some time to render or alternatively the models would not load individually even on speckle viewer which was unusual. I believe it was most likely to do with some permission or rendering issues. 
+
+
+
