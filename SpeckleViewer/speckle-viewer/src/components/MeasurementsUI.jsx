@@ -18,7 +18,26 @@ export const measurementsParams = {
 // Function to create the Measurements UI
 export function makeMeasurementsUI(viewer) {
   const measurementsExtension = viewer.getExtension(MeasurementsExtension);
-  const pane = new Pane({ title: 'Measurements', expanded: true });
+  
+  // Adjust the width dynamically based on the screen size
+  const isMobile = window.innerWidth < 768;
+  const paneOptions = {
+    title: 'Measurements',
+    expanded: true,
+    width: isMobile ? 200 : 300, // Narrower width for mobile
+    height: isMobile ? 200 : 400, // Adjust height for mobile
+  };
+  
+  const pane = new Pane(paneOptions);
+
+  // Add a button to toggle collapse
+  const collapseButton = pane.addButton({ title: 'Toggle Collapse' });
+  let isExpanded = true;  // Track expansion state
+
+  collapseButton.on('click', () => {
+    isExpanded = !isExpanded;
+    pane.expanded = isExpanded; // Toggle the expansion state
+  });
 
   // Enable/Disable Measurements
   pane.addBinding(measurementsParams, 'enabled', { label: 'Enabled' })

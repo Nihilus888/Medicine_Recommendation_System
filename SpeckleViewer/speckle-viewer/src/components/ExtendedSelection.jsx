@@ -152,6 +152,7 @@ class ExtendedSelection extends SelectionExtension {
       geometryId: selectedObj.guid,
       geometryType: selectedObj.geometryType,
       speckleType: selectedObj.renderData?.speckleType || 'Unknown',
+      materialHash: selectedObj._materialHash
     }));
   
     if (this.metadataCallback) {

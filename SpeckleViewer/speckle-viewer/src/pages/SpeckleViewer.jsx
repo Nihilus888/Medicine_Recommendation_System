@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';  // Import the useNavigate hook
 import {
   Viewer,
   DefaultViewerParams,
@@ -6,13 +7,13 @@ import {
   CameraController,
   MeasurementsExtension,
   UrlHelper,
-  SectionOutlines, // SectionOutlines will remain as it can still be useful
 } from '@speckle/viewer';
 
 import MetadataTooltip from '../components/MetaDataToolTip';
 import { makeMeasurementsUI } from '../components/MeasurementsUI'; // Import your UI function
 import ExtendedSelection from '../components/ExtendedSelection';
 
+// Fetch Data from Mongo DB like objectID
 const fetchModelDataFromMongo = async () => {
   const response = await fetch('http://localhost:5000/api/models/67e6b1fc1e863b0dcf3aa431', {
     method: 'GET',
@@ -28,6 +29,7 @@ const fetchModelDataFromMongo = async () => {
   return data;
 };
 
+// Fetch object data from speckle
 const fetchObjectData = async (projectId, objectId, authToken) => {
   const response = await fetch(
     `https://app.speckle.systems/objects/${projectId}/${objectId}/single`,
@@ -52,8 +54,9 @@ const SpeckleViewer = () => {
   const viewerRef = useRef(null);
   const [viewer, setViewer] = useState(null);
   const [selectedMetadata, setSelectedMetadata] = useState(null);
-  const authToken = "9e16053cbe2a0811802746b4e3531367a0874e43b0"; // Replace with your token
-  const projectId = 'c832429e56'; // Hardcoded project ID
+  const authToken = import.meta.env.VITE_SPECKLE_TOKEN;
+  const projectId = import.meta.env.VITE_APP_PROJECT_ID; 
+  const navigate = useNavigate();  // Use the useNavigate hook
 
   useEffect(() => {
     const initializeViewer = async () => {
@@ -108,6 +111,7 @@ const SpeckleViewer = () => {
 
           // Initialize Measurements UI
           makeMeasurementsUI(newViewer); // Call your UI function
+          
         }
       } else {
         console.error("Model data or objectIds is invalid:", modelData);
@@ -126,10 +130,47 @@ const SpeckleViewer = () => {
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
-      <div ref={viewerRef} style={{ flex: 1, height: '600px' }} />
+      <div ref={viewerRef} style={{ flex: 1, height: '650px' }} />
 
       {/* Metadata Tooltip Component */}
       {selectedMetadata && <MetadataTooltip metadata={selectedMetadata} />}
+
+      {/* Home Button */}
+      <button
+        onClick={() => {
+          navigate('/');  
+          window.location.reload();  
+        }}
+  
+        style={{
+          position: 'absolute',
+          bottom: '6%',
+          left: '50%',
+          transform: 'translate(-50%, 50%)',  // Center the button at the bottom
+          padding: '12px 24px',
+          backgroundColor: '#5a009c',  // Indigo background
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          fontSize: '18px',
+          cursor: 'pointer',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+          transition: 'all 0.3s ease-in-out',  // Smooth transition for hover and active states
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.transform = 'translate(-50%, 50%) scale(1.1)';  // Slight scale-up effect
+          e.target.style.boxShadow = '0 8px 15px rgba(0, 0, 0, 0.3)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.transform = 'translate(-50%, 50%) scale(1)';  // Reset scale
+          e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';  // Reset shadow
+        }}
+        onFocus={(e) => e.target.style.boxShadow = '0 0 10px rgba(90, 0, 156, 0.8)'} // Focus effect
+        onBlur={(e) => e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'} // Remove focus effect
+      >
+        Home
+      </button>
+
     </div>
   );
 };

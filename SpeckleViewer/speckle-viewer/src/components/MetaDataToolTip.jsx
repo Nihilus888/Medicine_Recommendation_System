@@ -8,25 +8,46 @@ const MetadataTooltip = ({ metadata, position = { x: 0, y: 0 } }) => {
     <div
       style={{
         position: 'absolute',
-        top: position?.y || 0,  // Ensure position is defined
-        left: position?.x || 0,  // Ensure position is defined
-        background: 'linear-gradient(145deg, rgba(135, 206, 235, 0.9), rgba(70, 130, 180, 0.8))',  // Gradient blue background
-        color: 'black',  // Black text color for better contrast
-        padding: '12px',  // Slightly more padding for a better feel
-        borderRadius: '8px',  // Softer rounded corners
-        fontSize: '13px',  // Slightly larger text for better readability
-        maxWidth: '320px',  // Slightly wider max width
-        pointerEvents: 'none',  // Prevent tooltip from blocking other interactions
-        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',  // Soft shadow for depth
+        top: position?.y || 0,  
+        left: position?.x || 0, 
+        background: '#5a009c',  
+        color: '#fff',  
+        padding: '16px',  
+        borderRadius: '12px',  
+        fontSize: '14px', 
+        maxWidth: '350px',  
+        pointerEvents: 'none',  
+        boxShadow: '0 6px 15px rgba(0, 0, 0, 0.15)',  
+        border: '1px solid rgba(0, 0, 0, 0.1)',  
+        overflowWrap: 'break-word',  
+        whiteSpace: 'normal',  
+        transition: 'opacity 0.8s ease', 
       }}
     >
+      {/* Metadata content */}
       {metadata.map((data, index) => (
-        <div key={index}>
-          <strong>Batch ID:</strong> {data.batchId} <br />
-          <strong>Geometry ID:</strong> {data.geometryId} <br />
-          <strong>Type:</strong> {data.geometryType} <br />
-          <strong>Speckle Type:</strong> {data.speckleType}
-          <hr />
+        <div key={index} style={{ marginBottom: '12px' }}>
+          <div style={{ marginBottom: '6px', fontWeight: '600' }}>
+            <strong style={{ textDecoration: 'underline', color: '#f0f0f0' }}>Batch ID: </strong> 
+            <span style={{ color: '#f0f0f0' }}>{data.batchId}</span>
+          </div>
+          <div style={{ marginBottom: '6px', fontWeight: '600' }}>
+            <strong style={{ textDecoration: 'underline', color: '#f0f0f0' }}>Geometry ID: </strong> 
+            <span style={{ color: '#f0f0f0' }}>{data.geometryId}</span>
+          </div>
+          <div style={{ marginBottom: '6px', fontWeight: '600' }}>
+            <strong style={{ textDecoration: 'underline', color: '#f0f0f0' }}>Type: </strong> 
+            <span style={{ color: '#f0f0f0' }}>{data.geometryType}</span>
+          </div>
+          <div style={{ marginBottom: '6px', fontWeight: '600' }}>
+            <strong style={{ textDecoration: 'underline', color: '#f0f0f0' }}>Speckle Type: </strong> 
+            <span style={{ color: '#f0f0f0' }}>{data.speckleType}</span>
+          </div>
+          <div style={{ marginBottom: '6px', fontWeight: '600' }}>
+            <strong style={{ textDecoration: 'underline', color: '#f0f0f0' }}>Material Hash: </strong> 
+            <span style={{ color: '#f0f0f0' }}>{data.materialHash}</span>
+          </div>
+          {index !== metadata.length - 1 && <hr style={{ margin: '10px 0' }} />}
         </div>
       ))}
     </div>
