@@ -86,7 +86,13 @@ Due to time constraints as I only had 5 business days to do, I would have explor
 Using REST API to query their API resulted in a lot of data being fetched that might not have been necessary. I would have used GraphQL in this case as you can choose what variables you would like to query to make your data more streamlined as less bloated but unfortunately I'm not familiar enough with GraphQL to implement such a solution. After knowing this, I would learn and utilize GraphQL for these kind of 3D projects as it is more optimal.
 
 ## System Design Considerations
-From a scalability and resilient perspective as we load more models with more object ids, we could swap REST API for GraphQL to get the data that we really need instead of calling every property and metadata which would cause us to take up unnecessary resources. Furthermore, we can use Redis caching to store the data where it is access frequently and we remove stale data when it is no longer needed and we call the database if it is ever needed and store it in cache if it is being called repeatedly again. 
+From a scalability and resilient perspective as we load more models with more object ids, we could swap REST API for GraphQL to get the data that we really need instead of calling every property and metadata which would cause us to take up unnecessary resources. Furthermore, we can use Redis caching to store the data where it is access frequently and we remove stale data when it is no longer needed and we call the database if it is ever needed and store it in cache if it is being called repeatedly again.
+
+## Deployment
+
+I decided to use vercel to deploy my app as it is free of charge and easy to integrate with React.js and Next.js applications without much hassle.
+
+Here is the website link: https://speckle-view.vercel.app/
 
 
 
