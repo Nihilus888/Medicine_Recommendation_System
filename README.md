@@ -111,5 +111,5 @@ As we scale further, we can implement API gateways and load balancers to deal wi
 
 I decided to use vercel to deploy my app as it is free of charge and easy to integrate with React.js and Next.js applications without much hassle. If there are any issues, please do let me know. 
 
-Here is the website link: https://speckle-view.vercel.app/
+Here is the website link: https://speckle-viewer.vercel.app/
 
