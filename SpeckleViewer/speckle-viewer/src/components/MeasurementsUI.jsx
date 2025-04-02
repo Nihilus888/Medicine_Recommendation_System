@@ -18,17 +18,7 @@ export const measurementsParams = {
 // Function to create the Measurements UI
 export function makeMeasurementsUI(viewer) {
   const measurementsExtension = viewer.getExtension(MeasurementsExtension);
-  
-  // Adjust the width dynamically based on the screen size
-  const isMobile = window.innerWidth < 768;
-  const paneOptions = {
-    title: 'Measurements',
-    expanded: true,
-    width: isMobile ? 200 : 300, // Narrower width for mobile
-    height: isMobile ? 200 : 400, // Adjust height for mobile
-  };
-  
-  const pane = new Pane(paneOptions);
+  const pane = new Pane({ title: 'Measurements', expanded: true });
 
   // Add a button to toggle collapse
   const collapseButton = pane.addButton({ title: 'Toggle Collapse' });
