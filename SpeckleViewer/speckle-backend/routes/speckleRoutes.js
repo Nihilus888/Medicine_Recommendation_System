@@ -95,7 +95,7 @@ router.get('/download/single/:projectId/:objectId', async (req, res) => {
 
 
 // ----------------------------------------
-// 📥 4. Download a List of Objects and Store in DB
+// 4. Download a List of Objects and Store in DB
 // ----------------------------------------
 router.post('/download/list', async (req, res) => {
   const { objectIds } = req.body; // Expects ["id1", "id2", "id3"]
@@ -129,7 +129,7 @@ router.post('/download/list', async (req, res) => {
 });
 
 // ----------------------------------------
-// 📥 5. Download an Object and All its Children
+// 5. Download an Object and All its Children
 // ----------------------------------------
 router.get('/download/:objectId', async (req, res) => {
   const { objectId } = req.params;
@@ -153,7 +153,7 @@ router.get('/download/:objectId', async (req, res) => {
 });
 
 // ----------------------------------------
-// 📤 6. Fetch Saved Model Data from MongoDB
+// 6. Fetch Saved Model Data from MongoDB
 // ----------------------------------------
 router.get('/models/:modelId', async (req, res) => {
   const { modelId } = req.params;
@@ -178,7 +178,7 @@ router.get('/models/:modelId', async (req, res) => {
 });
 
 // ----------------------------------------
-// 📤 6. Fetch All Saved Model Data from MongoDB
+// 7. Fetch All Saved Model Data from MongoDB
 // ----------------------------------------
 router.get('/models', async (req, res) => {
     try {
