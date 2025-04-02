@@ -4,60 +4,35 @@ This project aims to replicate parts of speckle for CAD-BIM integration that req
 ## Tech Stack
 One of the most important considerations is choosing your tech stack as it is a software architectural design decision and I decided to go with these tech stack based on various considerations that I have identified
 
-1. React.js/Three.js 
+1. React.js
 
-    I chose React.js as there is a specific library called React Three Fiber which is a good React renderer that integrates well with Three.js. Another consideration is that I'm personally more familiar with React compared with other popular frontend frameworks like
-Vue or Angular
+    React.js was chosen because of its compatibility with the Speckle Viewer and my personal preference for React over other frontend frameworks like Vue or Angular. React’s component-based structure and rich ecosystem make it a great choice for building dynamic web apps.
 
 2. Node.js
 
-    Node.js integrates very well with React.js and MongoDB 
-which was my choice of my database. This tech stack is 
-quite popular as it is the MERN stack which is versatile, 
-easy to scale and scaffold. 
+    Node.js is used for the backend as it pairs well with React.js and MongoDB. It’s part of the popular MERN stack, known for being versatile, easy to scale, and efficient for handling asynchronous tasks, especially when interacting with APIs and managing real-time data.
 
 3. MongoDB
 
-    After testing their REST API with their various endpoints via Postman, it looks like they have a lot of unstructured data that is in a 
-JSON format. My rationale is using a relational database like MySQL or PostgreSQL will not be appropriate due to how there is a lot of 
-metadata and unstructured data for the 3D rendering. 
+    I chose MongoDB due to the unstructured nature of the 3D model data, which is typically stored in a JSON format. Relational databases like MySQL or PostgreSQL are not ideal here since they are better suited for structured data. MongoDB offers flexibility in storing this metadata and facilitates rapid development with large volumes of unstructured data, such as 3D model propertie
 
 ## API Integration
 
-I first started this project by reading the documentation 
-particularly the API integration so that I can understand 
-the different 
-endpoints that I can pull from. After reading the API 
-documentation, I used Postman to test the API after being 
-granted the necessary 
-permissions to call the necessary information. As I was 
-using REST API and not GraphQL to call the JSON data, 
-there were times where the data was quite large as I was calling all the data in one go.
+I began by thoroughly exploring Speckle's API documentation to understand the available endpoints. This allowed me to design the interaction flow with the backend effectively. Using Postman, I tested the various endpoints after securing the necessary permissions. One key consideration during this phase was the size of the data I was retrieving, as calling all endpoints in one go could result in significant payloads.
 
-After exploring the data, I integrated with their API using Node.js where I called all their API endpoints which was listed on their REST API documentation and integrated the data and stored those data into my database which was MongoDB. I had to structure the data in such a way where all the object Ids for a particular model would be kept into an array with a unique id where I can do a for loop and iterate through the object Ids to generate the 3D rendering via Speckle Viewer. 
+Once I had a good understanding of the data structure, I integrated the Speckle API using Node.js. The JSON data fetched from the API was stored in MongoDB. For each model, I structured the data so that object IDs were grouped into arrays. I then iterated through these IDs to generate 3D renderings via the Speckle Viewer.
 
 ## Frontend
 
-On the frontend, I used React-Routers for routing of my pages and had to do a lot of research on Speckle Viewer library after researching on their documentation to find out how to use it as they have integrated three.js to display the 3D models. There were two main things that I noticed after reading through the documentation which was:
+On the frontend, I used React-Router to handle page routing and navigation. I dedicated significant time to learning about the Speckle Viewer library, as it integrates Three.js for 3D model rendering. Some key observations from the documentation include:
 
 1. The Speckle Viewer
+2. 
+The Speckle Viewer serves as the core of the project. It provides a camera interface that allows users to zoom in, pan, rotate, and interact with the model in various ways. The viewer is crucial for displaying the 3D models that are the heart of the CAD-BIM integration.
 
-This is where the main camera is where we can download the 
-objectIds from the model and display it. Furthermore, we 
-can interact with the camera and do panning, zooming in 
-and zooming out and various rotations.
+3. Add-ons
 
-2. Add-ons
-
-There are certain features that can be added to the main 
-speckle viewer with many examples that was shown however 
-many of them were written in typescript which I'm not 
-familiar 
-with and a lot of the methods that were in the 
-documentation have been deprecated according to the 
-migration document update. So I have to choose those that 
-are not deprecated 
-and have no issues.
+The Speckle Viewer allows the addition of various tools and features. However, many examples were written in TypeScript, a language I'm less familiar with. Additionally, several methods in the documentation were deprecated, which required me to carefully select the up-to-date features. Despite this, I was able to integrate the core functionalities.
 
 There are three main functionalities that I did which I 
 think are important from my understanding of architecture 
@@ -68,12 +43,7 @@ and CAD:
 3. Selection extraction tools with metadata extractor when 
 clicked on.
 
-Adding more tools or more advanced models would start to 
-cause the downloading of the models to take a long time 
-render or alternatively the models would not load
-individually even on speckle viewer which was unusual. I 
-believe it was most likely to do with some permissions or 
-rendering issues. 
+As the complexity of the models increased, I noticed performance issues with long rendering times or models failing to load altogether. This could be due to permission or rendering-related issues. These challenges need further investigation to optimize the rendering process.
 
 ## Images
 
@@ -92,24 +62,40 @@ Home page is mobile responsive which I also factor into consideration from a UI/
 
 ## Technical Challenges (Assumptions and Limitations)
 
-There were a lot of things to learn and within a short period of time to decide on a tech stack and also learn about speckle view and its API within such a short time frame which was 5 business days. It was tricky to understand as I have not worked with 3D models like Three.js or 3D models on a software engineering basis but I have worked with Rhino 3D and Grasshopper before so it gave me some idea on what functionalities were essential. 
+Several challenges emerged during the development of this project, which I tackled by learning on the fly:
 
-Initially I struggled to really understand what was going on but after exploring, reading the documentation and playing around I started to get the hang of it and to find ways to implement them in this project like measurement, camera and the extraction selector. 
+1. Short Development Time: The project was completed in 5 business days, which was a tight timeline for learning about Speckle and integrating 3D models.
 
-Due to time constraints as I only had 5 business days to do, I would have explore adding more functionalities like Section tools where you can see the details inside the model or animation and custom text which you can do interesting animations and write comments for reference. 
+2. Learning Curve: While I had prior experience with 3D software like Rhino and Grasshopper, working with 3D models in a web development context was new to me. However, by diving into the documentation and experimenting, I quickly got the hang of it.
 
-Using REST API to query their API resulted in a lot of data being fetched that might not have been necessary. I would have used GraphQL in this case as you can choose what variables you would like to query to make your data more streamlined as less bloated but unfortunately I'm not familiar enough with GraphQL to implement such a solution. After knowing this, I would learn and utilize GraphQL for these kind of 3D projects as it is more optimal.
+3. Data Overload with REST API: The API returned large volumes of data, which were sometimes unnecessary. If I had more time, I would have used GraphQL to make data retrieval more efficient. GraphQL allows selective querying, which would optimize the amount of data being fetched, reducing bloat and improving performance.
 
-It is difficult to make the Speckle Viewer mobile responsive due to the nature of the 3d models taking up nearly the entire space with my measurement UI overlapping with the metadata tooltip when a particular model is being clicked on. If I had more time, I would probably do some figma mockups to see how to deal with this issue and probably redesign the pages but due to time constraints, I had to use this for now. 
-
+4. Mobile Responsiveness: Achieving full mobile responsiveness with 3D models posed difficulties, particularly with the measurement UI and metadata tooltips overlapping. With more time, I would design solutions via tools like Figma to address these layout issues.
+   
 ## System Design Considerations
-From a scalability and resilient perspective as we load more models with more object ids, we could swap REST API for GraphQL to get the data that we really need instead of calling every property and metadata which would cause us to take up unnecessary resources. Furthermore, we can use Redis caching to store the data where it is access frequently and we remove stale data when it is no longer needed and we call the database if it is ever needed and store it in cache if it is being called repeatedly again.
+To make this solution scalable and resilient, I considered the following architectural improvements:
 
-As we scale further, we can implement API gateways and load balancers to deal with high loads of request that will optimise the loads efficiently without it overloading one particular server using IP hashing or a round robin method to distribute it efficiently. 
+1. GraphQL Integration: Swapping REST API for GraphQL would allow me to query only the necessary data, reducing unnecessary payloads and improving performance.
+
+2. Caching with Redis: Implementing Redis caching could store frequently accessed data, thus reducing the load on the database and improving retrieval times. Expired or unused data can be purged from the cache when no longer needed.
+
+3. Scaling the Backend: As the app grows and more models are added, I would implement API gateways and load balancers. This would distribute requests evenly across multiple servers, improving performance and reliability.
+
+## Additional Suggestions
+
+1. Error Handling and Logging: Implementing robust error handling and logging using tools like Sentry would help track errors in production and make debugging easier.
+
+2. Versioning: Implementing version control for the API and ensuring backward compatibility would help with future upgrades without breaking existing functionalities.
+
+3. User Authentication: If the app were to expand, adding a user authentication mechanism would allow users to save their work, load custom models, and customize their experience.
+
+4. Performance Optimization: As more models are added, lazy loading and pagination of the 3D models could be employed to improve initial load times.
+
+With these improvements, the application could scale efficiently while maintaining performance and providing a smoother user experience.
 
 ## Deployment
 
-I decided to use vercel to deploy my app as it is free of charge and easy to integrate with React.js and Next.js applications without much hassle. If there are any issues, please do let me know. 
+For deployment, I chose Vercel due to its seamless integration with React.js and its free hosting tier, making it a cost-effective solution. The deployment process is straightforward, and Vercel handles scalability automatically.
 
 Here is the website link: https://speckle-viewer.vercel.app/
 
