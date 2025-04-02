@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 const modelSchema = new mongoose.Schema({
-  id: String,   // Unique identifier for the object
+  id: String,   
   name: String,
   visible: Boolean,
   elements: Array,
