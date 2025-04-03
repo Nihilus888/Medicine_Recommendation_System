@@ -12,9 +12,18 @@ const headers = {
   Accept: 'application/json',
 };
 
-// Define a model for speckle_models
-const speckleModelSchema = new mongoose.Schema({}, { strict: false }); // If you don't know the exact schema
+// Define a model for speckle_models (Will work on this if I had more time to define the data schema more strictly)
+const speckleModelSchema = new mongoose.Schema({}, { strict: false });
 const SpeckleModel = mongoose.model('SpeckleModel', speckleModelSchema, 'speckle_models');
+
+// Error handling function
+const handleError = (res, error, message) => {
+  console.error(error);
+  res.status(500).json({
+    error: message,
+    details: error.response?.data || error.message
+  });
+};
 
 // ----------------------------------------
 // 1. Check if the Server Contains a List of Objects
@@ -28,19 +37,10 @@ router.post('/diff', async (req, res) => {
 
     try {
       const url = `${CANONICAL_URL}/api/diff/${PROJECT_ID}`;
-      const response = await axios.post(
-        url,
-        { objects: JSON.stringify(objectIds) },
-        {
-          headers: {
-            Authorization: `Bearer ${SPECKLE_TOKEN}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await axios.post(url, { objects: JSON.stringify(objectIds) }, { headers });
       res.json(response.data);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to get object differences.', details: error.response?.data || error.message });
+      handleError(res, error, 'Failed to get object differences.');
     }
 });
 
@@ -55,15 +55,10 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
   const url = `${CANONICAL_URL}/objects/${PROJECT_ID}`;
   try {
-    const response = await axios.post(url, req.file.buffer, {
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json', // Or 'application/gzip' if gzipped
-      },
-    })
+    const response = await axios.post(url, req.file.buffer, { headers });
     res.json({ message: '✅ Objects uploaded successfully', data: response.data });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to upload objects.' });
+    handleError(res, error, 'Failed to upload objects.');
   }
 });
 
@@ -71,60 +66,36 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 //  3. Download a Single Object
 // ----------------------------------------
 router.get('/download/single/:projectId/:objectId', async (req, res) => {
-
   const { projectId, objectId } = req.params;
   const url = `${CANONICAL_URL}/objects/${projectId}/${objectId}/single`;
 
   try {
     const response = await axios.get(url, { headers });
-    
-    // Create a single document 
-    const downloadedObject = new SpeckleModel({
-      objectId: objectId,
-      data: response.data,  
-    });
-
-    // Store data in MongoDB
-    await downloadedObject.save();  
-
+    const downloadedObject = new SpeckleModel({ objectId, data: response.data });
+    await downloadedObject.save();  // Store data in MongoDB
     res.json(response.data);  
   } catch (error) {
-    res.status(500).json({ error: 'Failed to download single object.' });
+    handleError(res, error, 'Failed to download single object.');
   }
 });
-
 
 // ----------------------------------------
 // 4. Download a List of Objects and Store in DB
 // ----------------------------------------
 router.post('/download/list', async (req, res) => {
-  const { objectIds } = req.body; // Expects ["id1", "id2", "id3"]
-
+  const { objectIds } = req.body;
   if (!objectIds || !Array.isArray(objectIds)) {
-    return res.status(400).json({ error: "objectIds must be an array" });
+    return res.status(400).json({ error: 'objectIds must be an array' });
   }
 
   const url = `${CANONICAL_URL}/api/getobjects/${PROJECT_ID}`;
   try {
-    // Fetch the objects
-    const response = await axios.post(url, {
-      objects: JSON.stringify(objectIds),
-    }, { headers });
-
-    const objects = response.data;
-
-    // Create a single document with all objects
-    const downloadDocument = {
-      objectIds: objectIds,      
-      objects: objects,          
-      timestamp: new Date(),     
-    };
-
-    // Insert the single document into MongoDB
+    const response = await axios.post(url, { objects: JSON.stringify(objectIds) }, { headers });
+    const downloadDocument = { objectIds, objects: response.data, timestamp: new Date() };
     const savedDownload = await SpeckleModel.insertOne(downloadDocument);
     res.json({ message: "✅ Download saved as a single document in DB", data: savedDownload });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to download and save list of objects.' });
+    handleError(res, error, 'Failed to download and save list of objects.');
   }
 });
 
@@ -137,18 +108,11 @@ router.get('/download/:objectId', async (req, res) => {
 
   try {
     const response = await axios.get(url, { headers });
-
-    // Save to MongoDB
-    const newModel = new Model({
-      objectId,
-      projectId: PROJECT_ID,
-      modelData: response.data,
-    });
+    const newModel = new Model({ objectId, projectId: PROJECT_ID, modelData: response.data });
     await newModel.save();
-
     res.json({ message: '✅ Object and children downloaded & saved!', modelId: newModel._id });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to download object and its children.' });
+    handleError(res, error, 'Failed to download object and its children.');
   }
 });
 
@@ -157,23 +121,14 @@ router.get('/download/:objectId', async (req, res) => {
 // ----------------------------------------
 router.get('/models/:modelId', async (req, res) => {
   const { modelId } = req.params;
-
   try {
-
-    // Corrected usage of mongoose.Types.ObjectId with 'new'
     const model = await mongoose.connection.collection('speckle_models').findOne({ _id: new mongoose.Types.ObjectId(modelId) });
-
-    // Log the fetched model
-
-    // Check if model exists
     if (!model) {
       return res.status(404).json({ error: 'Model not found.' });
     }
-
-    // Return the model as a JSON response
     res.json(model);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch model from MongoDB.' });
+    handleError(res, error, 'Failed to fetch model from MongoDB.');
   }
 });
 
@@ -181,22 +136,17 @@ router.get('/models/:modelId', async (req, res) => {
 // 7. Fetch All Saved Model Data from MongoDB
 // ----------------------------------------
 router.get('/models', async (req, res) => {
-    try {
-        // Log database and collection
-        const collections = await mongoose.connection.db.listCollections().toArray();
-
-        // Fetch all models from the 'Speckle_Models' collection
-        const models = await mongoose.connection.collection('speckle_models').find().toArray();
-
-        if (models.length === 0) {
-            return res.status(404).json({ error: 'No models found.' });
-        }
-
-        // Return models as a JSON response
-        res.json(models);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch models from MongoDB.' });
+  try {
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    const models = await mongoose.connection.collection('speckle_models').find().toArray();
+    if (models.length === 0) {
+      return res.status(404).json({ error: 'No models found.' });
     }
+    res.json(models);
+  } catch (error) {
+    handleError(res, error, 'Failed to fetch models from MongoDB.');
+  }
 });
+
 // Export the router
 module.exports = router;

@@ -17,6 +17,8 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
+// simple test cases would write more test cases if I had more time
+
 describe('API Routes', () => {
 
   // Test for POST /diff

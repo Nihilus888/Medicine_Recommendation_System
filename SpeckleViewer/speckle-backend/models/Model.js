@@ -1,6 +1,7 @@
 // models/Model.js
 const mongoose = require('mongoose');
 
+// model schema for downloading objects in MongoDB DB
 const modelSchema = new mongoose.Schema({
   id: String,   
   name: String,
