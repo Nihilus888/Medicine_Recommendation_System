@@ -1,20 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ReactTyped as Typed } from 'react-typed';
 import { motion } from 'framer-motion';
 import { Link } from "react-router-dom";
+import FeatureCard from '../components/FeatureCard';
 
 function Home() {
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
     <div className="min-h-screen bg-gradient-to-r from-teal-500 via-blue-600 to-indigo-900 text-white relative overflow-hidden">
-
+      
       {/* Hero Section */}
       <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8">
         <motion.h1 
@@ -38,6 +31,7 @@ function Home() {
           </motion.span>
         </motion.h1>
 
+        {/* Hero description */}
         <motion.p 
           className="mt-6 max-w-3xl text-xl text-gray-300"
           initial={{ opacity: 0, y: 10 }}
@@ -47,6 +41,7 @@ function Home() {
           Explore, interact, and share your 3D architectural models with powerful visualization tools and collaborative features.
         </motion.p>
 
+        {/* Call-to-action button */}
         <div className="mt-10 flex space-x-4">
           <Link to="/speckle-viewer">
             <motion.button
@@ -66,6 +61,7 @@ function Home() {
       <div className="py-16 bg-black bg-opacity-30 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
+            {/* Section Title */}
             <motion.h2 
               className="text-3xl font-bold mb-12"
               initial={{ opacity: 0, scale: 0.9 }}
@@ -85,22 +81,17 @@ function Home() {
             </motion.h2>
           </div>
 
+          {/* Feature Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div 
-              className="p-6 bg-gradient-to-br from-blue-700 to-blue-900 rounded-xl shadow-lg border-2 border-blue-300 hover:shadow-lg hover:shadow-blue-400/50"
-              whileHover={{ scale: 1.05 }}
-            >
-              <h3 className="text-xl font-semibold mb-2">Cloud-Based Storage</h3>
-              <p className="text-gray-300">Store, access, and share your models from anywhere with secure cloud integration.</p>
-            </motion.div>
-
-            <motion.div 
-              className="p-6 bg-gradient-to-br from-blue-700 to-blue-900 rounded-xl shadow-lg border-2 border-blue-300 hover:shadow-lg hover:shadow-blue-400/50"
-              whileHover={{ scale: 1.05 }}
-            >
-              <h3 className="text-xl font-semibold mb-2">Interactive Visualization</h3>
-              <p className="text-gray-300">Explore models with advanced controls, measurements, and cross-section tools.</p>
-            </motion.div>
+            {/* Individual feature cards */}
+            <FeatureCard 
+              title="Cloud-Based Storage" 
+              description="Store, access, and share your models from anywhere with secure cloud integration." 
+            />
+            <FeatureCard 
+              title="Interactive Visualization" 
+              description="Explore models with advanced controls, measurements, and cross-section tools." 
+            />
           </div>
         </div>
       </div>

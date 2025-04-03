@@ -10,12 +10,15 @@ import {
 } from '@speckle/viewer';
 
 import MetadataTooltip from '../components/MetaDataToolTip';
-import { makeMeasurementsUI } from '../components/MeasurementsUI'; // Import your UI function
+import { makeMeasurementsUI } from '../components/MeasurementsUI'; 
 import ExtendedSelection from '../components/ExtendedSelection';
 
-// Fetch Data from Mongo DB like objectID
+import '../styled-components/HomeButton.css';
+
+// Fetch Data from MongoDB like objectID
 const fetchModelDataFromMongo = async () => {
-  const response = await fetch('http://localhost:5000/api/models/67e6b1fc1e863b0dcf3aa431', {
+  const databaseConnection = import.meta.env.VITE_DATABASE;
+  const response = await fetch(`${databaseConnection}/api/models/67e6b1fc1e863b0dcf3aa431`, {
     method: 'GET',
   });
 
@@ -55,7 +58,7 @@ const SpeckleViewer = () => {
   const [selectedMetadata, setSelectedMetadata] = useState(null);
   const authToken = import.meta.env.VITE_SPECKLE_TOKEN;
   const projectId = import.meta.env.VITE_APP_PROJECT_ID; 
-  const navigate = useNavigate();  // Use the useNavigate hook
+  const navigate = useNavigate();  
 
   useEffect(() => {
     const initializeViewer = async () => {
@@ -78,7 +81,7 @@ const SpeckleViewer = () => {
 
           // Initialize Measurement UI
           const measurements = newViewer.createExtension(MeasurementsExtension);
-          measurements.enabled = true; // Activate measurements UI
+          measurements.enabled = true; 
 
           // Wait for all objects to load and then load the objects
           const loadPromises = [];
@@ -109,7 +112,7 @@ const SpeckleViewer = () => {
           setViewer(newViewer);
 
           // Initialize Measurements UI
-          makeMeasurementsUI(newViewer); // Call your UI function
+          makeMeasurementsUI(newViewer);
           
         }
       } else {
@@ -136,36 +139,11 @@ const SpeckleViewer = () => {
 
       {/* Home Button */}
       <button
+        className="home-button"
         onClick={() => {
           navigate('/');  
           window.location.reload();  
         }}
-  
-        style={{
-          position: 'absolute',
-          bottom: '6%',
-          left: '50%',
-          transform: 'translate(-50%, 50%)',  // Center the button at the bottom
-          padding: '12px 24px',
-          backgroundColor: '#5a009c',  // Indigo background
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          fontSize: '18px',
-          cursor: 'pointer',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-          transition: 'all 0.3s ease-in-out',  // Smooth transition for hover and active states
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.transform = 'translate(-50%, 50%) scale(1.1)';  // Slight scale-up effect
-          e.target.style.boxShadow = '0 8px 15px rgba(0, 0, 0, 0.3)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.transform = 'translate(-50%, 50%) scale(1)';  // Reset scale
-          e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';  // Reset shadow
-        }}
-        onFocus={(e) => e.target.style.boxShadow = '0 0 10px rgba(90, 0, 156, 0.8)'} // Focus effect
-        onBlur={(e) => e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'} // Remove focus effect
       >
         Home
       </button>
