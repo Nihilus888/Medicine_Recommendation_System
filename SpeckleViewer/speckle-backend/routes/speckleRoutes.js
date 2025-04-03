@@ -45,7 +45,7 @@ router.post('/diff', async (req, res) => {
 });
 
 // ----------------------------------------
-// 2. Upload a Batch of Objects
+// 2. Upload a Batch of Objects (Need to test this out with real files)
 // ----------------------------------------
 const upload = multer(); 
 router.post('/upload', upload.single('file'), async (req, res) => {
