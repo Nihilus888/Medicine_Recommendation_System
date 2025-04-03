@@ -2,7 +2,7 @@
 This project aims to replicate parts of speckle for CAD-BIM integration that requires 3D rendering and API Integrations with Speckle
 
 ## Tech Stack
-One of the most important considerations is choosing your tech stack as it is a software architectural design decision and I decided to go with these tech stack based on various considerations that I have identified
+The choice of tech stack is a critical design decision, and I selected the following technologies based on the task that I was working on: 
 
 1. React.js
 
