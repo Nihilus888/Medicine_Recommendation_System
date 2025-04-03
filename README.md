@@ -27,7 +27,7 @@ Once I had a good understanding of the data structure, I integrated the Speckle 
 On the frontend, I used React-Router to handle page routing and navigation. I dedicated significant time to learning about the Speckle Viewer library, as it integrates Three.js for 3D model rendering. Some key observations from the documentation include:
 
 1. The Speckle Viewer
-2. 
+    
 The Speckle Viewer serves as the core of the project. It provides a camera interface that allows users to zoom in, pan, rotate, and interact with the model in various ways. The viewer is crucial for displaying the 3D models that are the heart of the CAD-BIM integration.
 
 3. Add-ons
