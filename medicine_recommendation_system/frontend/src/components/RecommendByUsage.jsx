@@ -7,7 +7,6 @@ import {
   List,
   ListItem,
   CircularProgress,
-  Alert,
   Paper,
   Fade,
   InputAdornment,
@@ -57,6 +56,11 @@ function RecommendByUsage() {
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
         <Typography variant="h5" align="center" gutterBottom>
           Medicine Recommendation by Symptoms
+        </Typography>
+
+        <Typography variant="h7" align="center" gutterBottom sx={{ mb: 2 }}>
+          Warning: Please use this for a general guide and consult your doctor for more accurate medical information. Please
+          input one symptom at a time for more accurate results.
         </Typography>
 
         <form onSubmit={fetchRecommendations}>
