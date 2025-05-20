@@ -1,11 +1,13 @@
 import './App.css';
 import RecommendationByUsage from './components/RecommendByUsage';
+import Header from './components/Header';
 
 function App() {
   return (
-    <main style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
+    <>
+      <Header />
       <RecommendationByUsage />
-    </main>
+    </>
   );
 }
 
