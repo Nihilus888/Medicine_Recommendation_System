@@ -10,6 +10,7 @@ import {
   Paper,
   Fade,
   InputAdornment,
+  Divider,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -48,25 +49,36 @@ function RecommendByUsage() {
 
   return (
     <Box
-      maxWidth={500}
+      maxWidth={2000}
       mx="auto"
-      mt={6}
-      px={3}
+      sx={{
+        bgcolor: '#000',
+        minHeight: '100vh',
+      }}
     >
-      <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
-        <Typography variant="h5" align="center" gutterBottom>
-          Medicine Recommendation by Symptoms
+      <Paper
+        elevation={6}
+        sx={{
+          p: 5,
+          borderRadius: 4,
+          bgcolor: '#1e1e1e',
+          color: '#fff',
+        }}
+      >
+        <Typography variant="h4" align="center" fontWeight={600} gutterBottom>
+          Symptom-Based Medicine Recommender
         </Typography>
 
-        <Typography variant="h7" align="center" gutterBottom sx={{ mb: 2 }}>
-          Warning: Please use this for a general guide and consult your doctor for more accurate medical information. Please
-          input one symptom at a time for more accurate results.
+        <Typography variant="body2" align="center" mb={3} sx={{ color: '#bbb' }}>
+          This is a general guide. Always consult a healthcare professional. For best results, input one symptom at a time.
         </Typography>
+
+        <Divider sx={{ mb: 3, bgcolor: '#333' }} />
 
         <form onSubmit={fetchRecommendations}>
           <TextField
             fullWidth
-            label="Enter symptoms (e.g., fever, cough)"
+            label="Enter a symptom (e.g., fever, cough)"
             variant="outlined"
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
@@ -74,13 +86,24 @@ function RecommendByUsage() {
             error={!!error}
             helperText={error}
             autoFocus
-            margin="normal"
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <SearchIcon color="action" />
+                  <SearchIcon sx={{ color: '#888' }} />
                 </InputAdornment>
-              )
+              ),
+            }}
+            InputLabelProps={{
+              sx: { color: '#aaa' },
+            }}
+            sx={{
+              input: { color: '#fff' },
+              '.MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: '#555' },
+                '&:hover fieldset': { borderColor: '#888' },
+                '&.Mui-focused fieldset': { borderColor: '#0af' },
+              },
+              mb: 2,
             }}
           />
 
@@ -90,7 +113,7 @@ function RecommendByUsage() {
             variant="contained"
             color="primary"
             size="large"
-            sx={{ mt: 2 }}
+            sx={{ mt: 3, py: 1.5 }}
             disabled={loading}
           >
             {loading ? <CircularProgress size={24} color="inherit" /> : 'Get Recommendations'}
@@ -98,19 +121,27 @@ function RecommendByUsage() {
         </form>
 
         <Fade in={recommendations.length > 0}>
-          <Box mt={4}>
-            <Typography variant="subtitle1" gutterBottom>
-              Recommended Medicines:
+          <Box mt={5}>
+            <Typography variant="h6" fontWeight={500} gutterBottom align="center">
+              Recommended Medicines
             </Typography>
             <List>
               {recommendations.map((med, idx) => (
                 <ListItem
                   key={idx}
                   divider
+                  display='flex'
+                  justifyContent='center'
+                  textAlign='center'
                   sx={{
-                    fontWeight: 500,
+                    px: 2,
+                    py: 1,
+                    borderRadius: 2,
+                    transition: 'background 0.3s',
+                    color: '#fff',
+                    borderBottom: '1px solid #333',
                     '&:hover': {
-                      bgcolor: 'action.hover',
+                      bgcolor: '#2a2a2a',
                       cursor: 'pointer',
                     },
                   }}
