@@ -10,7 +10,6 @@ function Footer() {
         px: 2,
         textAlign: 'center',
         bgcolor: '#000',
-        borderTop: '1px solid #e0e0e0',
       }}
     >
       <Typography variant="body2" color="white">
